@@ -3,6 +3,8 @@ from fastapi import FastAPI
 from sqlalchemy import text
 
 from app.db.session import engine
+from app.api.transaction import router as transactions_router
+
 
 app = FastAPI(
     title="LedgerLite API",
@@ -10,6 +12,7 @@ app = FastAPI(
     version="0.1.0",
 )
 
+app.include_router(transactions_router)
 
 @app.get("/")
 def root():

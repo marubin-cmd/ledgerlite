@@ -1,3 +1,3 @@
-from app.models.transactions import Transaction
+from app.models.transaction import Transaction
 
 __all__ = ["Transaction"]
