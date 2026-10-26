@@ -1,10 +1,7 @@
-
-from fastapi import FastAPI
+from fastapi import FastAPI, Depends
 from sqlalchemy import text
-
-from app.db.session import engine
-from app.api.transaction import router as transactions_router
-
+from sqlalchemy.orm import Session
+from app.api.transaction import router, get_db
 
 app = FastAPI(
     title="LedgerLite API",
@@ -12,7 +9,7 @@ app = FastAPI(
     version="0.1.0",
 )
 
-app.include_router(transactions_router)
+app.include_router(router)
 
 @app.get("/")
 def root():
@@ -23,18 +20,19 @@ def root():
 
 
 @app.get("/health")
-def health_check():
+def health_check(
+    db: Session = Depends(get_db)
+):
 
     try:
-        with engine.connect() as connection:
-            connection.execute(text("SELECT 1"))
+        db.execute(text("SELECT 1"))
 
         return {
             "status": "healthy",
             "database": "connected",
         }
 
-    except:
+    except Exception:
         return {
             "status": "not healthy",
             "database": "connection error"
