@@ -51,3 +51,12 @@ def client():
     app.dependency_overrides.clear()
 
 
+@pytest.fixture(autouse=True)
+def clean_transactions():
+    with test_engine.begin() as connection:
+        connection.execute(
+            Transaction.__table__.delete()
+        )
+
+
+
