@@ -1,0 +1,32 @@
+
+services:
+  api:
+    build: .
+    container_name: ledgerlite_api
+    ports:
+      - "8000:8000"
+    environment:
+      DATABASE_URL: postgresql+psycopg://ledgerlite_user:${DB_PASSWORD}@db:5432/ledgerlite
+    depends_on:
+      db:
+        condition: service_healthy
+
+  db:
+    image: postgres:18
+    container_name: ledgerlite_db
+    environment:
+      POSTGRES_DB: ledgerlite
+      POSTGRES_USER: ledgerlite_user
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+    ports:
+      - "5433:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ledgerlite_user -d ledgerlite"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+volumes:
+  postgres_data:
