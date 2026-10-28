@@ -139,32 +139,35 @@ def delete_transaction(
     db.commit()
 
 
-@router.get(
-    "/summary",
-)
-
+@router.get("/summary")
 def get_transaction_summary(
+    start_date: date | None = Query(default=None),
+    end_date: date | None = Query(default=None),
     db: Session = Depends(get_db),
 ):
+    query = db.query(Transaction)
 
-    total_income, total_expenses = db.query(
+    if start_date is not None:
+        query = query.filter(Transaction.transaction_date >= start_date)
+
+    if end_date is not None:
+        query = query.filter(Transaction.transaction_date <= end_date)
+
+    total_income, total_expenses = query.with_entities(
         func.coalesce(
             func.sum(
                 case(
-                    (Transaction.transaction_type == "income",
-                    Transaction.amount),
+                    (Transaction.transaction_type == "income", Transaction.amount),
                     else_=0,
                 )
             ),
             0,
         ),
-
         func.coalesce(
             func.sum(
                 case(
-                    (Transaction.transaction_type == "expense",
-                    Transaction.amount),
-                    else_=0
+                    (Transaction.transaction_type == "expense", Transaction.amount),
+                    else_=0,
                 )
             ),
             0,
@@ -173,8 +176,7 @@ def get_transaction_summary(
 
     balance = total_income - total_expenses
 
-    return{
-
+    return {
         "total_income": total_income,
         "total_expenses": total_expenses,
         "balance": balance,
