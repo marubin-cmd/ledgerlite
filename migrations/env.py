@@ -10,7 +10,7 @@ import os
 from dotenv import load_dotenv
 
 from app.db.session import Base
-from app.models import Transaction
+from app.models import Transaction, Category
 
 
 

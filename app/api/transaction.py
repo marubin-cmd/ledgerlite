@@ -10,18 +10,11 @@ from app.schemas.transaction import (
     TransactionResponse,
 )
 from datetime import date
+from app.db.dependencies import get_db
 
 router = APIRouter(prefix="/transactions", tags=["Transactions"])
 
 
-def get_db():
-    db = SessionLocal()
-
-    try:
-        yield db
-
-    finally:
-        db.close()
 
 @router.post(
     "",

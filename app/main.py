@@ -1,7 +1,9 @@
 from fastapi import FastAPI, Depends
 from sqlalchemy import text
 from sqlalchemy.orm import Session
-from app.api.transaction import router, get_db
+
+from app.api import transaction, category
+from app.db.dependencies import get_db
 
 app = FastAPI(
     title="LedgerLite API",
@@ -9,7 +11,9 @@ app = FastAPI(
     version="0.1.0",
 )
 
-app.include_router(router)
+app.include_router(transaction.router)
+app.include_router(category.router)
+
 
 @app.get("/")
 def root():

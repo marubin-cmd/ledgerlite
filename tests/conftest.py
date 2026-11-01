@@ -7,8 +7,9 @@ from sqlalchemy.orm import sessionmaker
 
 from app.main import app
 from app.db.session import Base
-from app.api.transaction import get_db
+from app.db.dependencies import get_db
 from app.models.transaction import Transaction
+from app.models.category import Category
 # from dotenv import load_dotenv
 
 # load_dotenv()
@@ -56,6 +57,10 @@ def clean_transactions():
     with test_engine.begin() as connection:
         connection.execute(
             Transaction.__table__.delete()
+        )
+
+        connection.execute(
+            Category.__table__.delete()
         )
 
 

@@ -1,5 +1,5 @@
-from sqlalchemy import Column, Date, DateTime, Integer, Numeric, String, func
-
+from sqlalchemy import Column, Date, DateTime, ForeignKey, Integer, Numeric, String, func
+from sqlalchemy.orm import relationship
 from app.db.session import Base
 
 
@@ -15,4 +15,15 @@ class Transaction(Base):
         DateTime(timezone=True),
         server_default=func.now(),
         nullable=False,
+    )
+
+    category_id = Column(
+    Integer,
+    ForeignKey("categories.id"),
+    nullable=True,
+    )
+
+    category = relationship(
+        "Category",
+        back_populates="transactions"
     )
