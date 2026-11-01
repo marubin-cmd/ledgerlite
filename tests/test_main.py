@@ -390,3 +390,61 @@ def test_update_category(client):
     assert updated_category["category_type"] == "expense"
 
 
+def test_update_category_not_found(client):
+    updated_data = {
+        "name": "Groceries",
+        "description": "Food and household supplies",
+        "category_type": "expense",
+    }
+
+    response = client.put(
+        "/categories/9999",
+        json=updated_data,
+    )
+
+    assert response.status_code == 404
+    assert response.json() == {
+        "detail": "Category not found"
+    }
+
+def test_delete_category(client):
+
+    category_data = {
+        "name": "Food",
+        "description": "Dinner, Breakfast, Lunch, Restaurants, etc",
+        "category_type": "expense"
+    }
+
+    create_response = client.post(
+        "/categories",
+        json=category_data
+    )
+
+    assert create_response.status_code == 201
+
+    category_id = create_response.json()["id"]
+
+    delete_response = client.delete(
+        f"/categories/{category_id}"
+    )
+
+    assert delete_response.status_code == 204
+    assert delete_response.content == b""
+
+    get_response = client.get("/categories/")
+    
+    assert all(
+        category["id"] != category_id
+        for category in get_response.json()
+    )
+
+def test_delete_category_not_found(client):
+
+    response = client.delete(
+        "/categories/9999"
+    )
+
+    assert response.status_code == 404
+    assert response.json() == {
+        "detail": "Category not found"
+    }

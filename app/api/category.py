@@ -82,4 +82,26 @@ def update_category(
     db.refresh(db_category)
 
     return db_category
+
+
+@router.delete(
+    "/{category_id}",
+    status_code= status.HTTP_204_NO_CONTENT
+)
+
+def delete_category(
+    category_id: int,
+    db: Session = Depends(get_db),
+):
+
+    category = db.get(Category, category_id)
+
+    if category is None:
+        raise HTTPException(
+            status_code= status.HTTP_404_NOT_FOUND,
+            detail= "Category not found",
+        )
+
+    db.delete(category)
+    db.commit()
     
