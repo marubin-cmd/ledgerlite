@@ -10,6 +10,7 @@ class TransactionCreate(BaseModel):
     amount: Decimal = Field(gt=0, max_digits=10, decimal_places=2)
     transaction_type: Literal["income", "expense"]
     transaction_date: date
+    category_id: int | None = None
 
 
 class TransactionResponse(BaseModel):
@@ -21,3 +22,6 @@ class TransactionResponse(BaseModel):
     transaction_type: str
     transaction_date: date
     created_at: datetime
+    category_id: int | None
+
+ 

@@ -448,3 +448,185 @@ def test_delete_category_not_found(client):
     assert response.json() == {
         "detail": "Category not found"
     }
+
+def test_create_transaction_with_category(client):
+
+    category_response = client.post(
+        "/categories",
+        json={
+            "name": "Food",
+            "description": "Meal and Groceries",
+            "category_type": "expense"
+        }
+    )
+
+    assert category_response.status_code == 201
+
+    category_id = category_response.json()["id"]
+
+    transaction_data = {
+            "description": "Lunch",
+            "amount": 250,
+            "transaction_type": "expense",
+            "transaction_date": "2026-11-03",
+            "category_id": category_id,
+    }
+
+    transaction_response = client.post(
+        "/transactions",
+        json=transaction_data
+    )
+
+    assert transaction_response.status_code==201
+
+    data = transaction_response.json()
+
+    assert data["description"] == "Lunch"
+    assert data["category_id"] == category_id
+
+def test_create_transaction_without_category(client):
+
+    transaction_data = {
+                "description": "Coffee",
+                "amount": 100,
+                "transaction_type": "expense",
+                "transaction_date": "2026-11-03",
+        }
+
+    transaction_response = client.post(
+        "/transactions",
+        json=transaction_data
+    )
+
+    assert transaction_response.status_code==201
+
+    data = transaction_response.json()
+
+    assert data["description"] == "Coffee"
+    assert data["category_id"] is None
+
+
+def test_create_transaction_with_invalid_category(client):
+
+    transaction_data = {
+        "description": "Dinner",
+        "amount": 350,
+        "transaction_type": "expense",
+        "transaction_date": "2026-11-03",
+        "category_id": 9999,
+    }
+
+    response = client.post(
+        "/transactions",
+        json=transaction_data,
+    )
+
+    assert response.status_code == 404
+    assert response.json() == {"detail": "Category not found"}
+
+def test_create_transaction_with_mismatched_category_type(client):
+
+    category_response = client.post(
+        "/categories",
+        json={
+            "name": "Food",
+            "description": "Meal and Groceries",
+            "category_type": "expense"
+        }
+    )
+
+    assert category_response.status_code == 201
+
+    category_id = category_response.json()["id"]
+
+
+    transaction_data = {
+            "description": "Dinner",
+            "amount": 350,
+            "transaction_type": "income",
+            "transaction_date": "2026-11-03",
+            "category_id": category_id
+        }
+
+    transaction_response = client.post(
+        "/transactions",
+        json=transaction_data
+    )
+
+    assert transaction_response.status_code==400
+    assert transaction_response.json() == {"detail": "Category type must match transaction type"}
+
+def test_update_transaction_with_mismatched_category_type(client):
+    category_response = client.post(
+        "/categories/",
+        json={
+            "name": "Salary",
+            "description": "Monthly salary",
+            "category_type": "income",
+        },
+    )
+
+    category_id = category_response.json()["id"]
+    assert category_response.status_code == 201
+
+    transaction_response = client.post(
+        "/transactions",
+        json={
+            "description": "Lunch",
+            "amount": 250,
+            "transaction_type": "expense",
+            "transaction_date": "2026-11-03",
+        },
+    )
+
+    transaction_id = transaction_response.json()["id"]
+
+    updated_data = {
+        "description": "Lunch",
+        "amount": 250,
+        "transaction_type": "expense",
+        "transaction_date": "2026-11-03",
+        "category_id": category_id,
+    }
+
+    response = client.put(
+        f"/transactions/{transaction_id}",
+        json=updated_data,
+    )
+    
+    assert response.status_code == 400
+    assert response.json() == {
+        "detail": "Category type must match transaction type"
+    }
+
+def test_delete_category_with_assigned_transactions(client):
+    category_response = client.post(
+        "/categories/",
+        json={
+            "name": "Food",
+            "description": "Meals and groceries",
+            "category_type": "expense",
+        },
+    )
+
+    category_id = category_response.json()["id"]
+
+    transaction_response = client.post(
+        "/transactions",
+        json={
+            "description": "Lunch",
+            "amount": 250,
+            "transaction_type": "expense",
+            "transaction_date": "2026-11-03",
+            "category_id": category_id,
+        },
+    )
+
+    assert transaction_response.status_code == 201
+
+    response = client.delete(f"/categories/{category_id}")
+
+    assert response.status_code == 409
+    assert response.json() == {
+        "detail": "Cannot delete category because transactions are assigned to it"
+    }

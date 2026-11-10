@@ -5,6 +5,7 @@ from sqlalchemy.orm import Session
 from sqlalchemy import func, case
 from app.db.session import SessionLocal
 from app.models.transaction import Transaction
+from app.models.category import Category
 from app.schemas.transaction import (
     TransactionCreate,
     TransactionResponse,
@@ -26,7 +27,28 @@ router = APIRouter(prefix="/transactions", tags=["Transactions"])
 def create_transaction(
     transaction_data: TransactionCreate,
     db: Session = Depends(get_db),
+
+
 ):
+
+    if transaction_data.category_id is not None:
+
+        category = db.get(Category, transaction_data.category_id)
+
+        if category is None:
+
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail="Category not found"
+            )
+
+        if category.category_type != transaction_data.transaction_type:
+
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="Category type must match transaction type"
+            )
+    
     transaction = Transaction(**transaction_data.model_dump())
 
     db.add(transaction)
@@ -100,6 +122,21 @@ def update_transaction(
             status_code=status.HTTP_404_NOT_FOUND,
             detail="Transaction not found",
         )
+
+    if transaction_data.category_id is not None:
+        category = db.get(Category, transaction_data.category_id)
+
+        if category is None:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail="Category not found",
+            )
+
+        if category.category_type != transaction_data.transaction_type:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="Category type must match transaction type",
+            )
 
     for field, value in transaction_data.model_dump().items():
         setattr(transaction, field, value)

@@ -1,8 +1,9 @@
-from fastapi import APIRouter, Depends, status
+from fastapi import APIRouter, Depends, status, HTTPException
 from sqlalchemy.orm import Session
-from fastapi import HTTPException
+from typing import Literal
 from app.db.dependencies import get_db
 from app.models.category import Category
+from app.models.transaction import Transaction
 from app.schemas.category import CategoryCreate, CategoryResponse
 
 
@@ -37,13 +38,13 @@ def create_category(
 )
 
 def get_categories(
-    category_type: str | None = None,
+    category_type: Literal["income", "expense"] | None = None,
     db: Session = Depends(get_db)
 ):
 
     query = db.query(Category)
 
-    if category_type:
+    if category_type is not None:
 
         query = query.filter(Category.category_type == category_type)
 
@@ -101,6 +102,17 @@ def delete_category(
             status_code= status.HTTP_404_NOT_FOUND,
             detail= "Category not found",
         )
+
+    transactions = db.query(Transaction).filter(
+        Transaction.category_id == category_id
+    ).first()
+
+    if transactions is not None:
+        raise HTTPException(
+            status_code=status.HTTP_409_CONFLICT,
+            detail="Cannot delete category because transactions are assigned to it"
+        )
+
 
     db.delete(category)
     db.commit()
