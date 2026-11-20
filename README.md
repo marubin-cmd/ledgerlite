@@ -61,64 +61,116 @@ ledgerlite/
 
 ### Prerequisites
 
-- Docker
-- Docker Compose
-- Git
+Make sure you have the following installed:
 
-### 1. Clone the repository
+- Python 3.14+
+- PostgreSQL
+- Git
+- Docker and Docker Compose (optional)
+
+### 1. Clone the Repository
 
 ```bash
-git clone https://github.com/marubin-cmd/ledgerlite.git
+git clone https://github.com/YOUR_GITHUB_USERNAME/ledgerlite.git
 cd ledgerlite
 ```
 
-### 2. Configure environment variables
+### 2. Create a Virtual Environment
+
+```bash
+python -m venv .venv
+source .venv/bin/activate
+```
+
+### 3. Install Dependencies
+
+```bash
+pip install -r requirements.txt
+```
+
+### 4. Configure Environment Variables
 
 Create a `.env` file in the project root:
 
 ```env
-DB_PASSWORD=your_secure_password
+DATABASE_URL=postgresql+psycopg://USERNAME:PASSWORD@localhost:5432/ledgerlite
+TEST_DATABASE_URL=postgresql+psycopg://USERNAME:PASSWORD@localhost:5432/ledgerlite_test
 ```
 
-Replace `your_secure_password` with a secure password.
+Replace `USERNAME` and `PASSWORD` with your PostgreSQL credentials.
 
-Docker Compose uses this variable to configure PostgreSQL and construct the application's database connection string.
+**Important:** The default PostgreSQL port is `5432`. If you're connecting to the PostgreSQL Docker container from your host machine using the current Docker Compose configuration, use port `5433` instead.
 
-**Note:** Never commit your `.env` file or expose database credentials in your repository.
-Use your own secure database password.
+Never commit your actual `.env` file or database credentials.
 
-### 3. Build and run the application
+### 5. Create the Databases
+
+Create the development and test databases in PostgreSQL:
+
+```sql
+CREATE DATABASE ledgerlite;
+CREATE DATABASE ledgerlite_test;
+```
+
+Make sure your PostgreSQL user has permission to access both databases.
+
+### 6. Apply Database Migrations
 
 ```bash
-docker compose up --build
+alembic upgrade head
 ```
 
-Docker Compose starts the FastAPI application and PostgreSQL database.
+This creates the required database tables and schema using Alembic migrations.
 
-Database migrations are executed through the application entrypoint.
+### 7. Run the Application
 
-### 4. Access the API
+```bash
+uvicorn app.main:app --reload
+```
 
-Once the containers are running, access the following endpoints:
+The API will be available at:
 
-| Endpoint | Description |
-|---|---|
-| `http://localhost:8000` | API welcome endpoint |
-| `http://localhost:8000/health` | Application health check |
-| `http://localhost:8000/docs` | Interactive Swagger UI |
-| `http://localhost:8000/redoc` | ReDoc API documentation |
+```text
+http://127.0.0.1:8000
+```
 
-## Running Tests
+Interactive API documentation:
 
-LedgerLite uses Pytest for automated testing.
+- Swagger UI: http://127.0.0.1:8000/docs
+- ReDoc: http://127.0.0.1:8000/redoc
 
-Tests require a separate test database configured through `TEST_DATABASE_URL`.
+### 8. Run Automated Tests
 
-Activate your virtual environment and run:
+Make sure `TEST_DATABASE_URL` points to a dedicated test database, not your development database.
+
+Run:
 
 ```bash
 python -m pytest -v
 ```
+
+The project currently has **108 passing automated tests**.
+
+### Running with Docker (Optional)
+
+To build and start the application and PostgreSQL containers:
+
+```bash
+docker compose up --build -d
+```
+
+Check container status:
+
+```bash
+docker compose ps
+```
+
+Stop the containers:
+
+```bash
+docker compose down
+```
+
 
 ## Development Focus
 
