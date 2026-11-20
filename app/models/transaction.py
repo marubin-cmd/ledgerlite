@@ -23,7 +23,19 @@ class Transaction(Base):
     nullable=True,
     )
 
+    payment_id = Column(
+        Integer,
+        ForeignKey("payments.id"),
+        nullable=True,
+        unique=True
+    )
+
     category = relationship(
         "Category",
         back_populates="transactions"
+    )
+
+    payment = relationship(
+    "Payment",
+    back_populates="transaction"
     )

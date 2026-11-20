@@ -165,6 +165,12 @@ def delete_transaction(
             detail= "Transaction not found",
         )
 
+    if transaction.payment_id is not None:
+        raise HTTPException(
+            status_code=status.HTTP_409_CONFLICT,
+            detail="This transaction is linked to a payment. Delete the payment instead."
+        )
+
     db.delete(transaction)
     db.commit()
 
