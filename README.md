@@ -74,12 +74,17 @@ cd ledgerlite
 
 ### 2. Configure environment variables
 
-Create a `.env` file in the project root.
+Create a `.env` file in the project root:
 
 ```env
 DB_PASSWORD=your_secure_password
 ```
 
+Replace `your_secure_password` with a secure password.
+
+Docker Compose uses this variable to configure PostgreSQL and construct the application's database connection string.
+
+**Note:** Never commit your `.env` file or expose database credentials in your repository.
 Use your own secure database password.
 
 ### 3. Build and run the application
