@@ -343,3 +343,343 @@ aside nav a.active {
   font-size: 14px;
   flex-shrink: 0;
 }
+
+
+/* Dashboard.tsx */
+.dashboard {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.dashboard-heading {
+  margin-bottom: 24px;
+}
+
+.dashboard-heading h1 {
+  margin: 0;
+  font-size: 24px;
+  color: var(--text-h)
+}
+
+.dashboard-heading p {
+  margin: 6px 0 0;
+  color: var(--text)
+}
+
+.summary-cards {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 20px
+}
+
+.summary-card {
+  padding: 24px;
+  background-color: var(--bg);
+  border: 1px solid var(--border);
+  border-left: 4px solid var(--accent);
+  border-radius: 12px;
+}
+
+.summary-card p {
+  color: var(--text);
+  margin: 0;
+  font-size: 14px;
+}
+
+.summary-card h2 {
+  margin: 12px 0 0;
+  font-size: 28px;
+  color: var(--text-h);
+}
+
+@media (max-width: 1100px) {
+  .summary-cards {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+
+@media (max-width: 600px) {
+  .summary-cards {
+    grid-template-columns: repeat(1, 1fr);
+  }
+}
+
+.recent-transactions {
+  margin-top: 32px;
+  padding: 24px;
+  background-color: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+}
+
+.section-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 20px;
+
+}
+
+.section-heading h2 {
+  margin: 0;
+  font-size: 18px;
+  color: var(--text-h);
+}
+
+.section-heading p {
+  margin: 6px 0 0;
+  font-size: 14px;
+  color: var(--text);
+}
+
+.transactions-placeholder {
+  padding: 32px 16px;
+  text-align: center;
+  border: 1px dashed var(--border);
+  border-radius: 8px;
+}
+
+.transactions-placeholder p {
+  margin: 0;
+  color: var(--text);
+  font-size: 14px;
+}
+
+.transactions-table {
+  width: 100%;
+  overflow-x: auto;
+}
+
+.transactions-table table {
+  width: 100%;
+  border-collapse: collapse;
+  text-align: left;
+}
+
+.transactions-table th,
+.transactions-table td {
+  padding: 14px 16px;
+  border-bottom: 1px solid var(--border);
+  white-space: nowrap;
+}
+
+.transactions-table th {
+  color: var(--text);
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.transactions-table td {
+  color: var(--text-h);
+  font-size: 14px;
+}
+
+.transactions-table tbody tr:last-child td {
+  border-bottom: none;
+}
+
+.transaction-type {
+  display: inline-block;
+  padding: 5px 10px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.transaction-type.income {
+  color: #16803C;
+  background-color: rgba(22, 128, 60, 0.12);
+}
+
+.transaction-type.expense {
+  color: #DC4545;
+  background-color: rgba(220, 69, 69, 0.12);
+} 
+
+
+.financial-overview {
+  padding: 24px;
+  background-color: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+}
+
+.chart-container {
+  width: 100%;
+  min-width: 0;
+}
+
+.view-all-link {
+  color: var(--accent);
+  text-decoration: none;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.view-all-link:hover {
+  text-decoration: underline;
+}
+
+.recent-invoices {
+  margin-top: 24px;
+  padding: 24px;
+  background-color: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+}
+
+.invoices-placeholder {
+  padding: 32px 16px;
+  text-align: center;
+  border: 1px dashed var(--border);
+  border-radius: 8px;
+}
+
+.invoices-placeholder p {
+  margin: 0;
+  color: var(--text);
+  font-size: 14px;
+}
+
+.invoices-table {
+  width: 100%;
+  overflow-x: auto;
+}
+
+.invoices-table table {
+  width: 100%;
+  text-align: left; 
+  border-collapse: collapse;
+}
+
+.invoices-table table th,
+.invoices-table table td {
+  padding: 14px 16px;
+  border-bottom: 1px solid var(--border);
+  white-space: nowrap;  
+}
+
+.invoices-table th {
+  color: var(--text);
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.invoices-table td {
+  color: var(--text-h);
+  font-size: 14px;
+}
+
+.invoices-table table tr:last-child td {
+  border-bottom: none;
+}
+
+.invoice-status {
+  display: inline-block;
+  padding: 5px 10px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.invoice-status.draft {
+  color: #6B7280;
+  background-color: rgba(107, 114, 128, 0.12);
+}
+
+.invoice-status.unpaid {
+  color: #2563EB;
+  background-color: rgba(37, 99, 235, 0.12);
+}
+
+.invoice-status.paid {
+  color: #16803C;
+  background-color: rgba(22, 128, 60, 0.12);
+}
+
+.invoice-status.partially_paid {
+  color: #B7791F;
+  background-color: rgba(183, 121, 31, 0.12);
+}
+
+.invoice-status.due {
+  color: #DC4545;
+  background-color: rgba(220, 69, 69, 0.12);
+}
+
+.invoice-status.cancelled {
+  color: #6B7280;
+  background-color: rgba(107, 114, 128, 0.12);
+}
+
+
+.charts-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1.5fr) minmax(0, 1fr);
+  gap: 24px;
+  width: 100%;
+  min-width: 0;
+}
+
+.chart-card {
+  min-width: 0;
+  padding: 24px;
+  background-color: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+}
+
+.chart-card h3 {
+  margin: 0 0 16px;
+  font-size: 16px;
+  color: var(--text-h);
+}
+
+@media (max-width: 900px) {
+  .charts-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
+.donut-chart-container {
+  position: relative;
+  width: 100%;
+}
+
+.donut-chart-center {
+  position: absolute;
+  top: 45%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 5px;
+  pointer-events: none;
+  white-space: nowrap;
+
+}
+
+.donut-chart-center span {
+  color: var(--text);
+  font-size: 12px;
+}
+
+.donut-chart-center strong {
+  color: var(--text-h);
+  font-size: 20px;
+}
+
+.donut-chart-center small {
+  color: var(--text);
+  font-size: 11px;
+}
+
+.invoice-number {
+  font-weight: 600;
+  color: var(--text-h);
+}
+
+
