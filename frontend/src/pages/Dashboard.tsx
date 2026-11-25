@@ -1,8 +1,53 @@
 import { NavLink } from "react-router"
+import { useEffect, useState } from "react"
+
+import { getDashboardSummary, type DashboardSummary } from "../services/dashboardService"
+import { getInvoices, type Invoice } from "../services/invoiceService"
+
 import IncomeExpenseChart from "../components/charts/IncomeExpenseChart"
 import ExpensesByCategoryChart from "../components/charts/ExpensesbyCategoryChart"
 
 function Dashboard() {
+
+    const [summary, setSummary] = useState<DashboardSummary | null>(null)
+    const [invoices, setInvoice] = useState<Invoice[]>([]) 
+
+    const [loading, setLoading] = useState(true)
+    const [error, setError] = useState<string | null>(null)
+
+    const outstandingBalance = invoices.filter(invoice =>
+        ["unpaid", "partially_paid", "overdue"].includes(invoice.status))
+        .reduce((total, invoice) => total + Number(invoice.balance), 0)
+    
+
+    useEffect(() => {
+        async function fetchSummary() {
+            try {
+                const data = await getDashboardSummary()
+                setSummary(data)
+
+                const invoiceData = await getInvoices()
+                setInvoice(invoiceData)
+
+            } catch (err) {
+                setError("Unable to load dashboard summary.")
+                console.error(err)
+            } finally {
+                setLoading(false)
+            }
+        }
+
+        fetchSummary()
+    }, [])
+
+    if (loading) {
+        return <p>Loading dashboard...</p>
+    }
+
+    if (error) {
+        return <p>{error}</p>
+    }
+
     return(
         <div className="dashboard">
             
@@ -15,22 +60,42 @@ function Dashboard() {
 
                 <div className="summary-card">
                     <p>Total Income</p>
-                    <h2>₱0.00</h2>
+                    <h2>
+                        ₱{summary?.total_income.toLocaleString("en-PH", {
+                            minimumFractionDigits: 2,
+                            maximumFractionDigits: 2
+                        })}
+                    </h2>
                 </div>
 
                 <div className="summary-card">
                     <p>Total Expense</p>
-                    <h2>₱0.00</h2>
+                    <h2>
+                        ₱{summary?.total_expenses.toLocaleString("en-PH", {
+                            minimumFractionDigits: 2,
+                            maximumFractionDigits: 2
+                        })}
+                    </h2>
                 </div>
 
                 <div className="summary-card">
                     <p>Balance</p>
-                    <h2>₱0.00</h2>
+                    <h2>
+                        ₱{summary?.balance.toLocaleString("en-PH", {
+                            minimumFractionDigits: 2,
+                            maximumFractionDigits: 2
+                        })}
+                    </h2>
                 </div>
 
                 <div className="summary-card">
                     <p>Outstanding Invoices</p>
-                    <h2>₱0.00</h2>
+                        <h2>
+                            ₱{outstandingBalance.toLocaleString("en-PH", {
+                                minimumFractionDigits: 2,
+                                maximumFractionDigits: 2
+                            })}
+                        </h2>
                 </div>
 
             </div>
