@@ -1,18 +1,25 @@
 import { Outlet } from "react-router";
+import { useState } from "react";
 import Sidebar from "../components/Sidebar";
 import Header from "../components/Header";
 
 
 function MainLayout() {
 
+    const [isSidebarOpen, setIsSidebarOpen] = useState(false)
+
     return (
 
         <div className="app-layout">
-            <Sidebar />
+            <Sidebar
+                isOpen={isSidebarOpen}
+                onClose={() => setIsSidebarOpen(false)}
+
+            />
 
             <div className="main-area">
             
-                <Header />
+                <Header onMenuClick={() => setIsSidebarOpen(true)} />
                 
                 <main>
                     <Outlet />

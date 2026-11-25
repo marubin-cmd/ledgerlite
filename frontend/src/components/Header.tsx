@@ -1,7 +1,15 @@
-import { Search, Bell } from 'lucide-react'
+import { Search, Bell, Menu } from 'lucide-react'
 import { useLocation } from 'react-router'
 
-function Header() {
+
+
+type Headerprops = {
+    onMenuClick: () => void
+}
+
+function Header({ onMenuClick }: Headerprops) {
+
+
 
     const location = useLocation()
 
@@ -51,6 +59,16 @@ function Header() {
     return(
 
         <header className="app-header">
+
+            <button 
+                className="menu-button"
+                type="button"
+                onClick={onMenuClick}
+                aria-label="Open navigation menu"
+            >
+                <Menu size={28}/>
+            </button>
+            
 
             <div className="header-title">
                 <h1>{currentPage.title}</h1>

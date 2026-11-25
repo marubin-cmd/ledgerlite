@@ -271,6 +271,10 @@ aside nav a.active {
   border-bottom: 1px solid var(--border);
 }
 
+.menu-button {
+  display: none;
+}
+
 .header-title h1 {
   margin: 0;
   font-size: 24px;
@@ -682,4 +686,90 @@ aside nav a.active {
   color: var(--text-h);
 }
 
+@media (max-width: 768px) {
+  /* Sidebar stays outside the screen by default */
+  .app-layout > aside {
+    position: fixed;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    width: 250px;
+    z-index: 1001;
+    transform: translateX(-100%);
+    transition: transform 0.3s ease;
+  }
 
+  /* Slide sidebar into view when open */
+  .app-layout > aside.open {
+    transform: translateX(0);
+  }
+
+  /* Dark overlay behind the sidebar */
+  .sidebar-backdrop {
+    position: fixed;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    border: none;
+    background: rgba(0, 0, 0, 0.5);
+    z-index: 1000;
+    cursor: pointer;
+  }
+
+  /* Show hamburger button */
+  .menu-button {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 6px;
+    border: none;
+    background: transparent;
+    color: var(--text-h);
+    cursor: pointer;
+  }
+
+    /* Header layout */
+  .app-header {
+    padding: 16px;
+    gap: 12px;
+  }
+
+  /* Page title */
+  .header-title {
+    min-width: 0;
+    flex: 1;
+  }
+
+  .header-title h1 {
+    font-size: 20px;
+  }
+
+  .header-title p {
+    font-size: 12px;
+  }
+
+  /* Search bar */
+  .search-box {
+    display: none;
+  }
+
+  /* Notification button */
+  .notification-button {
+    height: 40px;
+    padding: 8px;
+    font-size: 0;
+  }
+
+  /* User avatar */
+  .user-avatar {
+    width: 34px;
+    height: 34px;
+    font-size: 12px;
+  }
+
+  /* Main content spacing */
+  .main-area main {
+    padding: 16px;
+  }
+
+}

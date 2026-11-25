@@ -8,47 +8,63 @@ import {
   Wallet,
 } from 'lucide-react'
 
-function Sidebar() {
+type SidebarProps = {
+    isOpen: boolean
+    onClose: () => void
+}
+
+function Sidebar({ isOpen, onClose} : SidebarProps) {
 
     return (
 
-        <aside>
+        <>
+            {isOpen && (
+                <button
+                    className="sidebar-backdrop"
+                    onClick={onClose}
+                    aria-label="Close navigation menu"
+                />
+            )}
+        
 
-            <h2>Ledgerlite</h2>
+            <aside className={`sidebar ${isOpen ? "open" : ""}`}>
 
-            <nav>
-                <NavLink to="/" className={ ({ isActive }) => isActive ? 'active' : ''}>
-                    <LayoutDashboard size={18} />  
-                    Dashboard
-                </NavLink>
+                <h2>Ledgerlite</h2>
 
-                <NavLink to="/transactions" className={ ({ isActive }) => isActive ? 'active' : ''}>
-                    <ArrowLeftRight size={18} />
-                    Transactions
-                </NavLink>
+                <nav>
+                    <NavLink to="/" onClick={onClose} className={ ({ isActive }) => isActive ? 'active' : ''}>
+                        <LayoutDashboard size={18} />  
+                        Dashboard
+                    </NavLink>
 
-                <NavLink to="/invoices" className={ ({ isActive }) => isActive ? 'active' : ''}>
-                    <FileText size={18} />
-                    Invoices
-                </NavLink>
+                    <NavLink to="/transactions" onClick={onClose} className={ ({ isActive }) => isActive ? 'active' : ''}>
+                        <ArrowLeftRight size={18} />
+                        Transactions
+                    </NavLink>
 
-                <NavLink to="/clients" className={ ({ isActive}) => isActive ? 'active' : ''}>
-                    <Users size={18} />
-                    Clients
-                </NavLink>
+                    <NavLink to="/invoices" onClick={onClose} className={ ({ isActive }) => isActive ? 'active' : ''}>
+                        <FileText size={18} />
+                        Invoices
+                    </NavLink>
 
-                <NavLink to="/categories" className={ ({ isActive }) => isActive ? 'active' : ''}>
-                    <Tags size={18} />
-                    Categories
-                </NavLink>
+                    <NavLink to="/clients" onClick={onClose} className={ ({ isActive}) => isActive ? 'active' : ''}>
+                        <Users size={18} />
+                        Clients
+                    </NavLink>
 
-                <NavLink to="/payments" className={ ({ isActive }) => isActive ? 'active' : ''}>
-                    <Wallet size={18} />
-                    Payments
-                </NavLink>
-            </nav>
+                    <NavLink to="/categories" onClick={onClose} className={ ({ isActive }) => isActive ? 'active' : ''}>
+                        <Tags size={18} />
+                        Categories
+                    </NavLink>
 
-        </aside>
+                    <NavLink to="/payments" onClick={onClose} className={ ({ isActive }) => isActive ? 'active' : ''}>
+                        <Wallet size={18} />
+                        Payments
+                    </NavLink>
+                </nav>
+
+            </aside>
+        </>
     )
 }
 
