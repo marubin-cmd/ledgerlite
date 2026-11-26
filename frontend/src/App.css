@@ -608,7 +608,7 @@ aside nav a.active {
   background-color: rgba(183, 121, 31, 0.12);
 }
 
-.invoice-status.due {
+.invoice-status.overdue {
   color: #DC4545;
   background-color: rgba(220, 69, 69, 0.12);
 }

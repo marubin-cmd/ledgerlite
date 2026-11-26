@@ -8,16 +8,64 @@ import {
   LabelList
 } from 'recharts'
 
+import type { Category } from '../../services/categoryService'
+import type { Transaction } from '../../services/transactionService'
 
-function ExpensesByCategoryChart() {
 
-    const data = [
-        { category: 'Food', amount: 8500, fill: '#D4AF37' },
-        { category: 'Transportation', amount: 4000, fill: '#6B6B6B' },
-        { category: 'Utilities', amount: 5500, fill: '#A68A3D' },
-        { category: 'Rent', amount: 12000, fill: '#9B9B9B' },
-        { category: 'Others', amount: 2500, fill: '#D8CBA5' },
+type ExpensesByCategoryChartProps = {
+    transactions: Transaction[]
+    categories: Category[]
+}
+
+
+function ExpensesByCategoryChart({ transactions, categories }: ExpensesByCategoryChartProps) {
+
+    const colors = [
+        '#D4AF37',
+        '#6B6B6B',
+        '#A68A3D',
+        '#9B9B9B',
+        '#D8CBA5',
     ]
+
+    const data = categories
+        .filter(category => category.category_type === "expense")
+        .map((category, index) => {
+            const amount = transactions
+                .filter(transaction =>
+                    transaction.category_id === category.id &&
+                    transaction.transaction_type === "expense"
+                )
+                .reduce(
+                    (total, transaction) => total + Number(transaction.amount),
+                    0
+                )
+
+            return {
+                category: category.name,
+                amount,
+                fill: colors[index % colors.length],
+            }
+        })
+        .filter(category => category.amount > 0)
+
+    const uncategorizedAmount = transactions
+    .filter(transaction =>
+        transaction.transaction_type === "expense" &&
+        transaction.category_id === null
+    )
+    .reduce(
+        (total, transaction) => total + Number(transaction.amount),
+        0
+    )
+
+    if (uncategorizedAmount > 0) {
+        data.push({
+            category: "Uncategorized",
+            amount: uncategorizedAmount,
+            fill: "#D8CBA5",
+        })
+    }
 
     const totalExpenses = data.reduce(
         (total, item) => total + item.amount,
@@ -26,7 +74,9 @@ function ExpensesByCategoryChart() {
 
     const chartData = data.map((item) => ({
         ...item,
-        percentage: `${((item.amount / totalExpenses) * 100).toFixed(0)}%`,
+        percentage: totalExpenses > 0
+            ? `${((item.amount / totalExpenses) * 100).toFixed(0)}%`
+            : "0%",
     }))
   
 
@@ -51,17 +101,12 @@ function ExpensesByCategoryChart() {
                 }
                 
 
-                shape={(props) => {
-                    const index = props.index ?? 0
-                    const categoryColor = data[index].fill
-
-                    return (
-                        <Sector
+                shape={(props) => (
+                    <Sector
                         {...props}
-                        fill={categoryColor}
-                        />
-                    )
-                }}
+                        fill={props.payload.fill}
+                    />
+                )}
 
 
             />
@@ -120,9 +165,14 @@ function ExpensesByCategoryChart() {
         <div className="donut-chart-center">
             <span>Total Expenses</span>
             <strong>
-                ₱{totalExpenses.toLocaleString('en-PH')}
+                ₱{totalExpenses.toLocaleString('en-PH', {
+                    minimumFractionDigits: 2,
+                    maximumFractionDigits: 2,
+                })}
             </strong>
-            <small>Across {data.length} categories</small>
+            <small>
+                Across {data.length} categories
+            </small>
         </div>
 
     </div>

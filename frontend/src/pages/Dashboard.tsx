@@ -1,8 +1,14 @@
 import { NavLink } from "react-router"
 import { useEffect, useState } from "react"
 
+import { getCategories, type Category } from "../services/categoryService"
 import { getDashboardSummary, type DashboardSummary } from "../services/dashboardService"
-import { getInvoices, type Invoice } from "../services/invoiceService"
+import { getDashboardInvoices, type DashboardInvoice } from "../services/invoiceService"
+import {
+    getTransactions,
+    getChartTransactions,
+    type Transaction
+} from "../services/transactionService"
 
 import IncomeExpenseChart from "../components/charts/IncomeExpenseChart"
 import ExpensesByCategoryChart from "../components/charts/ExpensesbyCategoryChart"
@@ -10,7 +16,10 @@ import ExpensesByCategoryChart from "../components/charts/ExpensesbyCategoryChar
 function Dashboard() {
 
     const [summary, setSummary] = useState<DashboardSummary | null>(null)
-    const [invoices, setInvoice] = useState<Invoice[]>([]) 
+    const [invoices, setInvoices] = useState<DashboardInvoice[]>([]) 
+    const [transactions, setTransactions] = useState<Transaction[]>([])
+    const [chartTransactions, setChartTransactions] = useState<Transaction[]>([])
+    const [categories, setCategories] = useState<Category[]>([])
 
     const [loading, setLoading] = useState(true)
     const [error, setError] = useState<string | null>(null)
@@ -23,14 +32,23 @@ function Dashboard() {
     useEffect(() => {
         async function fetchSummary() {
             try {
-                const data = await getDashboardSummary()
-                setSummary(data)
+                const summaryData = await getDashboardSummary()
+                setSummary(summaryData)
 
-                const invoiceData = await getInvoices()
-                setInvoice(invoiceData)
+                const invoiceData = await getDashboardInvoices()
+                setInvoices(invoiceData)
+
+                const transactionData = await getTransactions()
+                setTransactions(transactionData)
+
+                const chartTransactionData = await getChartTransactions()
+                setChartTransactions(chartTransactionData)
+
+                const categoryData = await getCategories()
+                setCategories(categoryData)
 
             } catch (err) {
-                setError("Unable to load dashboard summary.")
+                setError("Unable to load dashboard data.")
                 console.error(err)
             } finally {
                 setLoading(false)
@@ -50,11 +68,6 @@ function Dashboard() {
 
     return(
         <div className="dashboard">
-            
-            {/* <div className="dashboard-heading">
-                <h1>Dashboard</h1>
-                <p>Welcome to ledgerlite</p>
-            </div> */}
 
             <div className="summary-cards">
 
@@ -127,23 +140,46 @@ function Dashboard() {
                             </thead>
 
                             <tbody>
-                                <tr>
-                                    <td>Groceries</td>
-                                    <td>Food</td>
-                                    <td>Nov 24, 2026</td>
-                                    <td><span className="transaction-type expense">Expense</span></td>
-                                    <td>₱1,500.00</td>
-                                </tr>
+                                {transactions.map((transaction) => (
 
-                                <tr>
-                                    <td>Monthly Salary</td>
-                                    <td>Salary</td>
-                                    <td>Nov 23, 2026</td>
-                                    <td><span className="transaction-type income">Income</span></td>
-                                    <td>₱25,000.00</td>
-                                </tr>
+                                    <tr key={transaction.id}>
+
+                                        <td>{transaction.description}</td>
+
+                                        <td>{transaction.category_id ?? "--"}</td>
+
+                                        <td>
+                                            {new Date(transaction.transaction_date).toLocaleDateString("en-PH", {
+                                                month: "short",
+                                                day: "numeric",
+                                                year: "numeric"
+                                            })}
+                                        </td>
+
+                                        <td>
+                                            <span className={`transaction-type ${transaction.transaction_type}`}>
+                                                {transaction.transaction_type === "income" ? "Income" : "Expense"}
+                                            </span>
+                                            
+                                        </td>
+
+                                        <td>
+                                            {transaction.transaction_type === "income" ? "+" : "-"}
+                                            ₱{Number(transaction.amount).toLocaleString("en-PH", {
+                                                minimumFractionDigits: 2,
+                                                maximumFractionDigits: 2
+                                            })}
+                                        </td>
+
+                                    </tr>
+
+                                )
+                            
+                            
+                            )}
 
                             </tbody>
+
                         </table>
                     </div>
                 </div>
@@ -160,11 +196,11 @@ function Dashboard() {
 
                 <div className="charts-grid">
                     <div className="chart-card">
-                        <IncomeExpenseChart />
+                        <IncomeExpenseChart transactions={chartTransactions} />
                     </div>
 
                     <div className="chart-card">
-                        <ExpensesByCategoryChart />
+                        <ExpensesByCategoryChart transactions={chartTransactions} categories={categories}/>
                     </div>
                     
                 </div>
@@ -201,27 +237,49 @@ function Dashboard() {
                             </thead>
 
                             <tbody>
-                                <tr>
-                                    <td>INV-0001</td>
-                                    <td>John Doe</td>
-                                    <td>Nov 20, 2026</td>
-                                    <td>Nov 30, 2026</td>
-                                    <td>₱15,000.00</td>
-                                    <td>
-                                        <span className="invoice-status paid">Paid</span>
-                                    </td>
-                                </tr>
+                                {invoices.map((invoice) => (
+                                    <tr key={invoice.id}>
 
-                                <tr>
-                                    <td>INV-0002</td>
-                                    <td>Jane Smith</td>
-                                    <td>Nov 12, 2026</td>
-                                    <td>Dec 02, 2026</td>
-                                    <td>₱8,500.00</td>
-                                    <td>
-                                        <span className="invoice-status unpaid">Unpaid</span>
-                                    </td>
-                                </tr>
+                                        <td>{invoice.invoice_number}</td>
+                                        <td>{invoice.client_name}</td>
+
+                                        <td>
+                                            {new Date(invoice.issue_date).toLocaleDateString("en-PH", {
+                                                month: "short",
+                                                day: "numeric",
+                                                year: "numeric"
+                                            })}
+                                        </td>
+
+                                        <td>
+                                            {new Date(invoice.due_date).toLocaleDateString("en-PH", {
+                                                month: "short",
+                                                day: "numeric",
+                                                year: "numeric"
+                                            })}
+                                        </td>
+
+                                        <td>
+                                            ₱{Number(invoice.total).toLocaleString("en-PH", {
+                                                maximumFractionDigits: 2,
+                                                minimumFractionDigits: 2
+                                            })}
+                                        </td>
+
+                                        <td>
+                                            <span className={`invoice-status ${invoice.status}`}>
+                                                {invoice.status.replace("_", " ")}
+                                            </span>
+                                        </td>
+
+
+                                    </tr>
+                                
+                                )
+                                
+                            
+                            )}
+
                             </tbody>
 
                         </table>

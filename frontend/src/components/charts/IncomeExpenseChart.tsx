@@ -9,17 +9,45 @@ import {
   ResponsiveContainer,
 } from 'recharts'
 
+import type { Transaction } from "../../services/transactionService"
 
-function IncomeExpenseChart() {
+type IncomeExpenseChartProps = {
+    transactions: Transaction[]
+}
 
-    const data = [
-        { month: 'Jan', income: 30000, expenses: 18000 },
-        { month: 'Feb', income: 35000, expenses: 22000 },
-        { month: 'Mar', income: 28000, expenses: 15000 },
-        { month: 'Apr', income: 40000, expenses: 25000 },
-        { month: 'May', income: 38000, expenses: 21000 },
-        { month: 'Jun', income: 45000, expenses: 27000 },
-    ]
+
+
+function IncomeExpenseChart({ transactions }: IncomeExpenseChartProps) {
+
+    const data = transactions.reduce((acc, transaction) => {
+        const date = new Date(transaction.transaction_date)
+
+        const month = date.toLocaleString("en-PH", {
+            month: "short",
+        })
+
+        let monthData = acc.find(item => item.month === month)
+
+        if (!monthData) {
+            monthData = {
+                month,
+                income: 0,
+                expenses: 0,
+            }
+
+            acc.push(monthData)
+        }
+
+        if (transaction.transaction_type === "income") {
+            monthData.income += Number(transaction.amount)
+        } else {
+            monthData.expenses += Number(transaction.amount)
+        }
+
+        return acc
+    }, [] as { month: string; income: number; expenses: number }[])
+
+    data.reverse()
 
     return (
         <div>
