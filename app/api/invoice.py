@@ -9,7 +9,8 @@ from app.models.invoice import Invoice
 from app.schemas.invoice import (
     InvoiceCreate,
     InvoiceUpdate,
-    InvoiceResponse
+    InvoiceResponse,
+    DashboardInvoiceResponse
 )
 from app.services import invoice_service
 
@@ -101,6 +102,24 @@ def get_invoices(
 
     return invoices
 
+
+@router.get(
+    "/dashboard",
+    response_model=list[DashboardInvoiceResponse]
+)
+
+def get_dashboard_invoices(
+    db: Session = Depends(get_db),
+):
+
+    invoices = (
+        db.query(Invoice).order_by(
+        Invoice.issue_date.desc(), Invoice.id.desc()).limit(5).all()
+    )
+
+
+    return invoices
+    
 
 @router.get(
     "/{invoice_id}",
@@ -227,6 +246,7 @@ def cancel_invoice(
     return db_invoice
 
 
+
 @router.post(
     "/{invoice_id}/issue",
     response_model=InvoiceResponse
@@ -239,4 +259,4 @@ def issue_invoice(
 
     return invoice_service.issue_invoice(db, invoice_id)
 
-    
+
